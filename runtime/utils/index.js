@@ -1,30 +1,33 @@
 const MATCH_PARAM = RegExp(/\:([^/()]+)/g)
 
-export function handleScroll(element) {
+export function handleScroll (element) {
   if (navigator.userAgent.includes('jsdom')) return false
   scrollAncestorsToTop(element)
   handleHash()
 }
 
-export function handleHash() {
+export function handleHash () {
   if (navigator.userAgent.includes('jsdom')) return false
   const { hash } = window.location
   if (hash) {
-    const el = document.querySelector(hash)
-    if (hash && el) el.scrollIntoView()
+    const validElementIdRegex = /^[A-Za-z]+[\w\-\:\.]*$/
+    if (validElementIdRegex.test(hash.substring(1))) {
+      const el = document.querySelector(hash)
+      if (el) el.scrollIntoView()
+    }
   }
 }
 
-export function scrollAncestorsToTop(element) {
+export function scrollAncestorsToTop (element) {
   if (
     element &&
     element.scrollTo &&
     element.dataset.routify !== 'scroll-lock' &&
     element.dataset['routify-scroll'] !== 'lock'
   ) {
-    element.style['scroll-behavior'] = "auto"
+    element.style['scroll-behavior'] = 'auto'
     element.scrollTo({ top: 0, behavior: 'auto' })
-    element.style['scroll-behavior'] = ""
+    element.style['scroll-behavior'] = ''
     scrollAncestorsToTop(element.parentElement)
   }
 }
@@ -37,12 +40,11 @@ export const pathToRegex = (str, recursive) => {
   return str
 }
 
-export const pathToParams = string => {
-  const params = []
+export const pathToParamKeys = string => {
+  const paramsKeys = []
   let matches
-  while (matches = MATCH_PARAM.exec(string))
-    params.push(matches[1])
-  return params
+  while ((matches = MATCH_PARAM.exec(string))) paramsKeys.push(matches[1])
+  return paramsKeys
 }
 
 export const pathToRank = ({ path }) => {
@@ -56,7 +58,7 @@ export const pathToRank = ({ path }) => {
 let warningSuppressed = false
 
 /* eslint no-console: 0 */
-export function suppressWarnings() {
+export function suppressWarnings () {
   if (warningSuppressed) return
   const consoleWarn = console.warn
   console.warn = function (msg, ...msgs) {
@@ -70,8 +72,7 @@ export function suppressWarnings() {
   warningSuppressed = true
 }
 
-
-export function currentLocation() {
+export function currentLocation () {
   const pathMatch = window.location.search.match(/__routify_path=([^&]+)/)
   const prefetchMatch = window.location.search.match(/__routify_prefetch=\d+/)
   window.routify = window.routify || {}
