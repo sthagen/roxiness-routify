@@ -1,21 +1,16 @@
 <div align="center">
     <img src="routify.png" alt="routify" width="512" /><br>
-    <img src="https://badgen.net/npm/v/@sveltech/routify" alt="Badge" />
+    <img src="https://badgen.net/npm/v/@roxi/routify" alt="Badge" />
 </div> 
 
-----
-
-<p> 
-  <strong>Routify is a work in progress. Since v1.5 we have a stable release. But this is a relatively young project. You can expect it to evolve.</strong>
-</p>
 
 ----
 
 ## Install
 
-* Install the Router only: `npm install --save-dev @sveltech/routify`
-* Clone the [starter template](https://github.com/sveltech/routify-starter):
-    * `npx @sveltech/routify init`
+* Install the Router only: `npm install --save-dev @roxi/routify`
+* Clone the [starter template](https://github.com/roxiness/routify-starter):
+    * `npx @roxi/routify init`
     * The starter template contains a lot more than just the router, for more info see [here](https://routify.dev/guide/starter-Template).
 
 ## Documentation
@@ -24,7 +19,7 @@
 
 ## Template
 
-[Routify starter template](https://github.com/sveltech/routify-starter)
+[Routify starter template](https://github.com/roxiness/routify-starter)
 Includes SSR, prerendering, code splitting and much more.
 
 ## Example
@@ -44,7 +39,3 @@ Please feel free to open an issue or a pull request. All feedback is welcome.
 
 Want help? Have ideas about Routify? Chat with us on Discord. 
 https://discord.gg/ntKJD5B
-
-## Older versions
-
-For the old version (svelte-filerouter), please go [here](https://github.com/sveltech/routify/tree/v1)
