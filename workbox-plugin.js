@@ -65,13 +65,9 @@ function cleanupFreshCache() {
  * @param {Request} request 
  */
 function getPrefetchOptions({ referrer }) {
-    const search = (referrer.match(/\?(.+)/) || [null, ''])[1]
-    const routifyQueries = [...new URLSearchParams(search)].filter(([key]) => key.startsWith('__routify_'))
-
-    const options = {}
-    for (const [key, val] of routifyQueries)
-        options[key.replace(/^__routify_/, '')] = val
-
+    referrer = referrer.replace(/\w+:\/\/[^/]+/, '')
+    const [path, _options] = referrer.split('__[[routify_url_options]]__')
+    const options = JSON.parse(decodeURIComponent(_options || '') || '{}')
     return options
 }
 

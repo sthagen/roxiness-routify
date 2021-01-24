@@ -28,8 +28,8 @@
     "@types/node": ">=4.2.0 < 13",
     "chalk": "^4.0.0",
     "cheap-watch": "^1.0.2",
-    "commander": "^5.0.0",
-    "configent": "^1.0.3",
+    "commander": "^7.0.0",
+    "configent": "^2.1.1",
     "esm": "^3.2.25",
     "fs-extra": "^9.0.1",
     "log-symbols": "^3.0.0",
@@ -41,15 +41,15 @@
     "npm-run-all": "^4.1.5",
     "semantic-release": "^17.1.1",
     "start-server-and-test": "^1.11.3",
-    "svelte": "^3.24.1",
+    "svelte": "^3.31.0",
     "typescript": "^3.8.3"
   },
   "scripts": {
     "semantic-release": "semantic-release",
-    "start:example": "cd example && pnpm install && pnpm run dev",
+    "start:example": "cd test/example && npm install && npm run dev",
     "test": "cd test && ava tests/** --timeout 300s",
     "test:cli": "cd test && ava tests/cli/** --timeout 300s",
-    "test:e2e": "start-server-and-test start:example 5000 \"cd test && pnpm install && pnpx ava tests/e2e/** --watch\"",
+    "test:e2e": "start-server-and-test start:example 5000 \"cd test && npm install && npx ava tests/e2e/** --watch\"",
     "test:mock-api": "cd test && ava tests/mock-server/**"
   },
   "prettier": {

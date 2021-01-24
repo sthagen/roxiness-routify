@@ -8,10 +8,10 @@ export function init(routes, callback) {
   /** @type { ClientNode | false } */
   let lastRoute = false
 
-  async function updatePage(proxyToUrl, shallow) {
-    const url = proxyToUrl || currentLocation()
-    const route = urlToRoute(url, routes)
-    const currentRoute = shallow && urlToRoute(currentLocation(), routes)
+  function updatePage(proxyToUrl, shallow) {
+    const url = proxyToUrl || currentLocation().fullpath
+    const route = urlToRoute(url)
+    const currentRoute = shallow && urlToRoute(currentLocation().fullpath, routes)
     const contextRoute = currentRoute || route
     const nodes = [...contextRoute.layouts, route]
     if (lastRoute) delete lastRoute.last //todo is a page component the right place for the previous route?
@@ -24,10 +24,11 @@ export function init(routes, callback) {
     stores.route.set(route)
 
     //preload components in parallel
-    await route.api.preload()
-
-    //run callback in Router.svelte
-    callback(nodes)
+    route.api.preload().then(() => {
+      //run callback in Router.svelte    
+      stores.isChangingPage.set(true)
+      callback(nodes)
+    })
   }
 
   const destroy = createEventListeners(updatePage)
@@ -44,12 +45,16 @@ function createEventListeners(updatePage) {
   ;['pushState', 'replaceState'].forEach(eventName => {
     const fn = history[eventName]
     history[eventName] = async function (state = {}, title, url) {
+      // do nothing if we're navigating to the current page
+      const currentUrl = location.pathname + location.search + location.hash
+      if (url === currentUrl) return false
+      
       const { id, path, params } = get(stores.route)
       state = { id, path, params, ...state }
       const event = new Event(eventName.toLowerCase())
       Object.assign(event, { state, title, url })
 
-      if (await runHooksBeforeUrlChange(event)) {
+      if (await runHooksBeforeUrlChange(event, url)) {
         fn.apply(this, [state, title, url])
         return dispatchEvent(event)
       }
@@ -66,7 +71,7 @@ function createEventListeners(updatePage) {
       if (_ignoreNextPop)
         _ignoreNextPop = false
       else {
-        if (await runHooksBeforeUrlChange(event)) {
+        if (await runHooksBeforeUrlChange(event, currentLocation().fullpath)) {
           updatePage()
         } else {
           _ignoreNextPop = true
@@ -105,11 +110,11 @@ function handleClick(event) {
   history.pushState({}, '', href)
 }
 
-async function runHooksBeforeUrlChange(event) {
-  const route = get(stores.route)
+async function runHooksBeforeUrlChange(event, url) {  
+  const route = urlToRoute(url).api
   for (const hook of beforeUrlChange._hooks.filter(Boolean)) {
     // return false if the hook returns false
-    const result = await hook(event, route) //todo remove route from hook. Its API Can be accessed as $page
+    const result = await hook(event, route, { url })
     if (!result) return false
   }
   return true
