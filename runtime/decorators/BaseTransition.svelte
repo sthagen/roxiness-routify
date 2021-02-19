@@ -35,19 +35,24 @@
   $: normalizedConfig = { ...defaultConfig, ..._config }
   $: ({ transition, inParams, outParams } = normalizedConfig)
 
-  function setAbsolute({ target }) {
+  function setFixed({ target }) {
     const rect = target.getBoundingClientRect()
+    target.style.position = 'fixed'
     target.style.width = `${rect.width}px`
     target.style.height = `${rect.height}px`
     target.style.top = `${rect.top}px`
     target.style.left = `${rect.left}px`
-    target.style.position = 'fixed'
   }
-  function removeAbsolute({ target }) {
-    target.style.position = ''
-    target.style.width = ''
-    target.style.height = ''
-    target.style.transform = ''
+  function undoFixed({ target }) {
+    target.style.position = null
+    target.style.width = null
+    target.style.height = null
+    target.style.top = null
+    target.style.left = null
+  }
+
+  function hideOverflow(target) {
+    target.parentElement.classList.add('transition-container')
   }
 </script>
 
@@ -55,8 +60,9 @@
   class="transition node{get(node).__file.id}"
   in:transition|local={inParams}
   out:transition|local={outParams}
-  on:introstart={removeAbsolute}
-  on:outrostart={setAbsolute}
+  use:hideOverflow
+  on:introstart={undoFixed}
+  on:outrostart={setFixed}
 >
   <slot />
 </div>
@@ -65,5 +71,8 @@
   .transition {
     height: 100%;
     width: 100%;
+  }
+  .transition-container {
+    overflow: hidden;
   }
 </style>
