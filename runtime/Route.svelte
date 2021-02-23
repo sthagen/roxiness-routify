@@ -37,7 +37,7 @@
   const parentContextStore = getContext('routify')
   $: parentContext = $parentContextStore || $rootContext
 
-  const setparentNode = (el) => (parentNode = el.parentNode)
+  const setParentNode = (el) => (parentNode = el.parentNode)
 
   setContext('routify', context)
 
@@ -55,7 +55,6 @@
   /** @param {SvelteComponent} componentFile */
   function onComponentLoaded(componentFile) {
     scopedSync = { ...scoped }
-    if (remainingNodes.length === 0) onLastComponentLoaded()
 
     const ctx = {
       // we have to proxy remaining nodes through ctx or route changes get propagated
@@ -69,16 +68,17 @@
       parentNode: parentNode || parentContext.parentNode,
     }
     context.set(ctx)
+    if (remainingNodes.length === 0) onLastComponentLoaded()
   }
 
   async function onLastComponentLoaded() {
-    await tick()
-    handleScroll(parentNode)
+    tick().then(() => handleScroll(parentNode)) //scroll needs to run after next tick
+    await new Promise((resolve) => setTimeout(resolve))
     const isOnCurrentRoute = $context.component.path === $route.path //maybe we're getting redirected
 
     // Let everyone know the last child has rendered
-    if (!window['routify'].stopAutoReady && isOnCurrentRoute) 
-      onPageLoaded({ page: $context.component, metatags, afterPageLoad })    
+    if (!window['routify'].stopAutoReady && isOnCurrentRoute)
+      onPageLoaded({ page: $context.component, metatags, afterPageLoad })
   }
 
   /**  @param {ClientNode} layout */
@@ -101,16 +101,18 @@
         let:decorator
         {scoped}
         {scopedSync}
-        {...node.param || {}}>
+        {...node.param || {}}
+      >
         {#if component && nodes.length}
           <svelte:self
             {decorator}
             nodes={[...nodes]}
-            scoped={{ ...scoped, ...scopeToChild }} />
+            scoped={{ ...scoped, ...scopeToChild }}
+          />
         {/if}
       </svelte:component>
     </svelte:component>
   {/each}
 {/if}
 <!-- get the parent element for scroll and transitions -->
-<span use:setparentNode />
+<span use:setParentNode />
